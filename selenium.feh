@@ -1,0 +1,266 @@
+uses "regexp";
+uses "network";
+uses "console";
+
+class Selenium {
+	string browser;
+	string browserUrl;
+	string host;
+	number port;
+	string sessionId;
+	number timeout;
+
+	array commandArray;
+
+	constructor( string browser, string browserUrl ) {
+		self( browser, browserUrl, "localhost", 4444, 30000);
+	}
+    constructor( string browser, string browserUrl, string host, number port, number timeout ) {
+		self.browser = browser;
+		self.browserUrl = browserUrl;
+
+		self.host = host;
+		if( not self.host ) {
+			self.host = "localhost";
+		}
+		self.port = port;
+		if( not self.port ) {
+			self.port = 4444;
+		}
+		self.timeout = timeout;
+		if( not self.timeout ) {
+			self.timeout = 30000;
+		}
+		
+		self.commandArray = [
+			"addLocationStrategy" => 2,
+			"addScript" => 2,
+			"addSelection" => 2,
+			"allowNativeXpath" => 1,
+			"altKeyDown" => 0,
+			"altKeyUp" => 0,
+			"answerOnNextPrompt" => 1,
+			"assignId" => 2,
+			"attachFile" => 2,
+			"captureEntirePageScreenshot" => 2,
+			"captureEntirePageScreenshotToString" => [ "Arity" => 1, "function" => "getString" ],
+			"captureScreenshot" => 1,
+			"captureScreenshotToString" => [ "Arity" => 0, "function" => "getString" ],
+			"check" => 1,
+			"chooseCancelOnNextConfirmation" => 0,
+			"chooseOkOnNextConfirmation" => 0,
+			"click" => 1,
+			"clickAt" => 2,
+			"close" => 0,
+			"contextMenu" => 1,
+			"contextMenuAt" => 2,
+			"controlKeyDown" => 0,
+			"controlKeyUp" => 0,
+			"createCookie" => 2,
+			"deleteAllVisibleCookies" => 0,
+			"deleteCookie" => 2,
+			"deselectPopUp" => 0,
+			"doubleClick" => 1,
+			"doubleClickAt" => 2,
+			"dragAndDrop" => 2,
+			"dragAndDropToObject" => 2,
+			"dragdrop" => 2,
+			"fireEvent" => 2,
+			"focus" => 1,
+			"getAlert" => [ "Arity" => 0, "function" => "getString" ],
+			"getAllButtons" => [ "Arity" => 0, "function" => "getArray" ],
+			"getAllFields" => [ "Arity" => 0, "function" => "getArray" ],
+			"getAllLinks" => [ "Arity" => 0, "function" => "getArray" ],
+			"getAllWindowIds" => [ "Arity" => 0, "function" => "getArray" ],
+			"getAllWindowNames" => [ "Arity" => 0, "function" => "getArray" ],
+			"getAllWindowTitles" => [ "Arity" => 0, "function" => "getArray" ],
+			"getAttribute" => [ "Arity" => 1, "function" => "getString" ],
+			"getAttributeFromAllWindows" => [ "Arity" => 1, "function" => "getString" ],
+			"getBodyText" => [ "Arity" => 0, "function" => "getString" ],
+			"getConfirmation" => [ "Arity" => 0, "function" => "getString" ],
+			"getCookie" => [ "Arity" => 0, "function" => "getString" ],
+			"getCookieByName" => [ "Arity" => 1, "function" => "getString" ],
+			"getCursorPosition" => [ "Arity" => 1, "function" => "getNumber" ],
+			"getElementHeight" => [ "Arity" => 1, "function" => "getNumber" ],
+			"getElementIndex" => [ "Arity" => 1, "function" => "getNumber" ],
+			"getElementPositionLeft" => [ "Arity" => 1, "function" => "getNumber" ],
+			"getElementPositionTop" => [ "Arity" => 1, "function" => "getNumber" ],
+			"getElementWidth" => [ "Arity" => 1, "function" => "getNumber" ],
+			"getEval" => [ "Arity" => 1, "function" => "getString" ],
+			"getExpression" => [ "Arity" => 1, "function" => "getString" ],
+			"getHtmlSource" => [ "Arity" => 0, "function" => "getString" ],
+			"getLocation" => [ "Arity" => 0, "function" => "getString" ],
+			"getMouseSpeed" => [ "Arity" => 0, "function" => "getNumber" ],
+			"getPrompt" => [ "Arity" => 0, "function" => "getString" ],
+			"getSelectedId" => [ "Arity" => 1, "function" => "getString" ],
+			"getSelectedIds" => [ "Arity" => 1, "function" => "getArray" ],
+			"getSelectedIndex" => [ "Arity" => 1, "function" => "getString" ],
+			"getSelectedIndexes" => [ "Arity" => 1, "function" => "getArray" ],
+			"getSelectedLabel" => [ "Arity" => 1, "function" => "getString" ],	
+			"getSelectedLabels" => [ "Arity" => 1, "function" => "getString" ],
+			"getSelectedValue" => [ "Arity" => 1, "function" => "getString" ],
+			"getSelectedValues" => [ "Arity" => 1, "function" => "getString" ],
+			"getSelectOptions" => [ "Arity" => 1, "function" => "getArray" ],
+			"getSpeed" => [ "Arity" => 0, "function" => "getString" ],
+			"getTable" => [ "Arity" => 1, "function" => "getString" ],
+			"getText" => [ "Arity" => 0, "function" => "getBoolean" ],
+			"getTitle" => [ "Arity" => 0, "function" => "getString" ],
+			"getValue" => [ "Arity" => 0, "function" => "getString" ],
+			"getWhetherThisFrameMatchFrameExpression" => [ 'Arity' => 2, "function" => "getBoolean" ],
+			"getWhetherThisWindowMatchWindowExpression" => [ "Arity" => 2, "function" => "getBoolean" ],
+			"getXpathCount" => [ "Arity" => 1, "function" => "getNumber" ],
+			"goBack" => 0,
+			"highlight" => 1,
+			"ignoreAttributesWithoutValue" => 1,
+			"isAlertPresent" => [ "Arity" => 0, "function" => "getBoolean" ],
+			"isChecked" => [ "Arity" => 0, "function" => "getBoolean" ],
+			"isConfirmationPresent" => [ "Arity" => 0, "function" => "getBoolean" ],
+			"isCookiePresent" => [ "Arity" => 1, "function" => "getBoolean" ],
+			"isEditable" => [ "Arity" => 1, "function" => "getBoolean" ],
+			"isElementPresent" => [ "Arity" => 1, "function" => "getBoolean" ],
+			"isOrdered" => [ "Arity" => 2, "function" => "getBoolean" ],
+			"isPromptPresent" => [ "Arity" => 0, "function" => "getBoolean" ],
+			"isSomethingSelected" => [ "Arity" => 1, "function" => "getBoolean" ],
+			"isTextPresent" => [ "Arity" => 1, "function" => "getBoolean" ],
+			"isVisible" => [ "Arity" => 1, "function" => "getBoolean" ],
+			"keyDown" => 2,
+			"keyDownNative" => 1,
+			"keyPress" => 2,
+			"keyPressNative" => 1,
+			"keyUp" => 2,
+			"keyUpNative" => 1,
+			"metaKeyDown" => 0,
+			"metaKeyUp" => 0,
+			"mouseDown" => 1,
+			"mouseDownAt" => 2,
+			"mouseDownRight" => 1,
+			"mouseDownRightAt" => 2,
+			"mouseMove" => 1,
+			"mouseMoveAt" => 2,
+			"mouseOut" => 1,
+			"mouseOver" => 1,
+			"mouseUp" => 1,
+			"mouseUpAt" => 2,
+			"mouseUpRight" => 1,
+			"mouseUpRightAt" => 2,
+			"open" => 1,
+			"openWindow" => 2,
+			"refresh" => 0,
+			"removeAllSelections" => 1,
+			"removeScript" => 1,
+			"removeSelection" => 2,
+			"retrieveLastRemoteControlLogs" => [ "Arity" => 0, "function" => "getString" ],
+			"rollup" => 2,
+			"runScript" => 1,
+			"select" => 2,
+			"selectFrame" => 1,
+			"selectPopUp" => 1,
+			"selectWindow" => 1,
+			"setBrowserLogLevel" => 1,
+			"setContext" => 1,
+			"setCursorPosition" => 2,
+			"setMouseSpeed" => 1,
+			"setSpeed" => 1,
+			"setTimeout" => 1,
+			"shiftKeyDown" => 0,
+			"shiftKeyUp" => 0,
+			"shutDownSeleniumServer" => 0,
+			"submit" => 1,
+			"type" => 2,
+			"typeKeys" => 2,
+			"uncheck" => 1,
+			"useXpathLibrary" => 1,
+			"waitForCondition" => 2,
+			"waitForFrameToLoad" => 2,
+			"waitForPageToLoad" => 1,
+			"waitForPopUp" => 2,
+			"windowFocus" => 0,
+			"windowMaximize" => 0
+		];
+	}
+
+    public function start() {
+        self.sessionId = self.getString("getNewBrowserSession", [ self.browser, self.browserUrl ]);
+        return self.sessionId;
+    }
+    public function stop() {
+        self.doCommand("testComplete");
+        self.sessionId = '';
+    }
+
+	function doCommand( string command ) {
+		return .doCommand(command, []);
+	}
+    function doCommand( string verb, array args ) {
+		string url = "http://${.host}:${.port}/selenium-server/driver/?cmd=${String.urlEncode(verb)}";
+		object connection = null;
+		object response = null;
+
+		args.eachWithIndex() using ( value, index ) {
+			number argNum = index + 1;
+			string argument = "$value".urlEncode();
+			url += "&$argNum=$argument";
+		};
+
+		if( self.sessionId ) {
+			url += "&sessionId=" + self.sessionId;
+		}
+
+		connection = Network.HTTP.get(url);
+		response = connection.run();
+
+		if( response.success() )
+			return response.body();
+
+		return '';
+    }
+	function getNumber( string verb, array args ) {
+		return self.getString(verb, args).toNumber();
+	}
+	function getString( string verb, array args ) {
+		string result = self.doCommand(verb, args);
+		return (result.length() > 3 ? result[3..] : '');
+	}
+    function getArray( string verb, array args ) {
+        string csv = self.getString(verb, args);
+		Console.println("getSArray: $csv");
+        return [];
+    }
+    function getBoolean( string verb, array args ) {
+        string result = self.getString(verb, args);
+        switch (result) {
+        case 'true':
+            return true;
+        case 'false':
+            return false;
+        default:
+            raise new Error('result is neither "true" or "false": ' + result);
+        }
+    }
+
+	function method_missing( ... ) {
+		array a = arguments();
+		string name = a.pop();
+		
+		if( self.commandArray.keyExists(name) ) {
+			void commandDescriptions = .commandArray[name];
+			if( commandDescriptions isa number ) {
+				a = (commandDescriptions ? a[0..(commandDescriptions - 1)] : []);
+				return .doCommand(name, a);
+			}
+			else {
+				a = (commandDescriptions['Arity'] ? a[0..(commandDescriptions['Arity'] - 1)] : []);
+				switch( commandDescriptions['function'] ) {
+					case 'getNumber':
+						return .getNumber(name, a);
+					case 'getString':
+						return .getString(name, a);
+					case 'getArray':
+						return .getArray(name, a);
+					case 'getBoolean':
+						return .getBoolean(name, a);
+				}
+			}
+		}
+	}
+}
