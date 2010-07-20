@@ -1,5 +1,6 @@
 /**
- * Format for Selenium Remote Control PHP client.
+ * Format for Selenium Remote Control ferite client.
+ * Adapted from the PHP Selenium Remote Control client.
  * Thanks to Sonic.
  */
 
