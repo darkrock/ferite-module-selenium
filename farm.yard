@@ -2,7 +2,7 @@
 <yard name="selenium">
 
 	<property id="name" value="ferite-selenium" />
-	<property id="version" value="3.1" />
+	<property id="version" value="3.2" />
 	
 	<collection id="selenium">
 		<property type="prefix" value="$(FeriteModuleSourceDir)" />  
